@@ -58,9 +58,14 @@ def _coerce_types_weight(df):
         df["Product"] = df["Product"].astype(str).str.strip()
     if "Weight_lb" in df.columns:
         df["Weight_lb"] = pd.to_numeric(df["Weight_lb"], errors="coerce")
-    df["Key_Product"] = (df.get("Product","").astype(str)
-                         .str.lower().str.replace(r"[^a-z0-9]+"," ", regex=True)
-                         .str.replace(r"\s+"," ", regex=True).str.strip())
+    prod_col = df.get("Product")
+if prod_col is None or not hasattr(prod_col, "astype"):
+    prod_col = pd.Series([], dtype=str)
+df["Key_Product"] = (prod_col.astype(str)
+                     .str.lower()
+                     .str.replace(r"[^a-z0-9]+", " ", regex=True)
+                     .str.replace(r"\s+", " ", regex=True)
+                     .str.strip())
     return df[["Product","Weight_lb","Key_Product"]]
 
 def _clean_headers(cols):
