@@ -25,6 +25,7 @@ def _as_series(df, col):
         obj = obj.iloc[:, 0]
     return obj
 
+
 def _clean_headers(cols):
     return [str(c).strip() for c in cols]
 
