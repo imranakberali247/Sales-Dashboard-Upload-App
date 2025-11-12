@@ -9,6 +9,25 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
 from datetime import datetime
 
+# --- safe helpers ---
+def _as_series(df, col):
+    """Return a single Series for df[col], even if duplicate columns exist."""
+    obj = df.get(col)
+    if obj is None:
+        return pd.Series([], dtype=str)
+    # if there are duplicate columns, df[col] can be a DataFrame
+    if isinstance(obj, pd.DataFrame):
+        obj = obj.iloc[:, 0]
+    return obj
+
+header = _clean_headers(df.iloc[idx].tolist())
+data = df.iloc[idx+1:].reset_index(drop=True)
+data.columns = header
+# ADD THIS LINE:
+data = data.loc[:, ~pd.Index(data.columns).duplicated()]
+data = _normalize_column_names(data)
+data = _coerce_types_sales(data) if mode=="sales" else _coerce_types_weight(data)
+
 st.set_page_config(page_title="Sales Dashboard (Robust Upload)", layout="wide")
 st.title("Sales Dashboard — Upload & Filter (Robust)")
 st.caption("Handles multi-sheet files, banners above headers, and flexible column names.")
